@@ -119,17 +119,19 @@ export default function Dashboard() {
               ? "🟢 Database connection active"
               : "🟢 New User Data Synced!");
 
-            // Send Login Email on every login
-            emailjs.send(
-              "service_32mzb8d",
-              "template_c4s2pbh",
-              {
-                student_name: user.fullName || user.firstName || "Student",
-                student_email: user.primaryEmailAddress.emailAddress,
-                login_time: new Date().toLocaleString(),
-              },
-              "uCKcJ-jhu63oWbXTQ"
-            ).catch(err => console.warn("EmailJS login error:", err));
+            // Send Welcome Email ONLY for brand new users
+            if (data.message === "User created successfully") {
+              emailjs.send(
+                "service_32mzb8d",
+                "template_c4s2pbh",
+                {
+                  student_name: user.fullName || user.firstName || "Student",
+                  student_email: user.primaryEmailAddress.emailAddress,
+                  login_time: new Date().toLocaleString(),
+                },
+                "uCKcJ-jhu63oWbXTQ"
+              ).catch(err => console.warn("EmailJS welcome error:", err));
+            }
               
             if (data.user.role === 'STUDENT') {
                const historyResp = await fetch(`https://prepexam-backend.onrender.com/api/users/me/results?clerk_id=${user.id}`);
