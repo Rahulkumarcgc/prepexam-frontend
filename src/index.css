@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+body {
+  margin: 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: #f8fafc;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Enhancing Clerk UI overrides to match the premium design */
+.cl-card {
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+}
+.cl-socialButtonsBlockButton {
+  border: 1px solid #e2e8f0 !important;
+  transition: all 0.2s !important;
+}
+.cl-socialButtonsBlockButton:hover {
+  background-color: #f8fafc !important;
+  transform: translateY(-1px) !important;
+}
