@@ -38,10 +38,18 @@ export default function Dashboard() {
   const handleSaveRoll = async (e) => {
     e.preventDefault();
     if (!rollInput.trim()) return;
+
+    // Strict Format Validation: CS-Sem-Roll (e.g., CS-1-101)
+    const rollRegex = /^CS-[1-8]-[0-9]{1,4}$/i;
+    if (!rollRegex.test(rollInput)) {
+      alert("Invalid Format! Please use: CS-(Semester)-(RollNo)\nExample: CS-1-101");
+      return;
+    }
+
     try {
       const resp = await fetch(`https://prepexam-backend.onrender.com/api/users/roll`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ clerk_id: user.id, roll_number: rollInput.trim() })
+        body: JSON.stringify({ clerk_id: user.id, roll_number: rollInput.trim().toUpperCase() })
       });
       if (resp.ok) {
         setShowRollModal(false);
@@ -169,15 +177,40 @@ export default function Dashboard() {
     }
   };
 
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#f4f6fa] dark:bg-slate-950 p-6 font-sans transition-colors duration-300">
       <nav className="w-full h-16 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 flex justify-between items-center px-6 mb-8">
-        <h1 onClick={() => navigate("/")} className="text-xl font-bold text-indigo-700 dark:text-indigo-400 cursor-pointer">PrepExam Portal</h1>
+        <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-4">
+          <h1 onClick={() => navigate("/")} className="text-xl font-bold text-indigo-700 dark:text-indigo-400 cursor-pointer">PrepExam Portal</h1>
+          <div className="hidden sm:flex items-center gap-3 bg-gray-50/50 dark:bg-slate-800/50 px-4 py-1.5 rounded-xl border border-gray-100 dark:border-slate-800 transition-all shadow-inner">
+             <div className="text-indigo-500 dark:text-indigo-400">
+               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+             </div>
+             <div className="flex flex-col text-left leading-tight">
+               <span className="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-tighter">{currentTime.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+               <span className="text-xs font-black text-gray-800 dark:text-slate-100 font-mono tracking-wide">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+             </div>
+          </div>
+        </div>
+        
         <div className="flex items-center gap-4">
           <ThemeToggle />
           <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700" title={syncStatus}>
             <div className={`w-2.5 h-2.5 rounded-full animate-pulse ${syncStatus.includes('🟢') ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.6)]' : syncStatus.includes('🔴') ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.6)]' : 'bg-amber-500'}`}></div>
           </div>
+          {dbUser?.role === 'STUDENT' && dbUser?.roll_number && (
+            <div className="hidden lg:flex flex-col items-end mr-1">
+              <span className="text-[9px] font-black text-gray-400 dark:text-slate-500 uppercase tracking-widest">Roll Number</span>
+              <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 tracking-wider">{dbUser.roll_number}</span>
+            </div>
+          )}
           <SignedIn><UserButton /></SignedIn>
         </div>
       </nav>
@@ -190,7 +223,7 @@ export default function Dashboard() {
             <h2 className="text-2xl font-bold text-gray-800">
               Hello, {user?.firstName || "Student"} 👋
             </h2>
-            <p className="text-gray-500 mt-2">Welcome to your secure portal. Your active authority level is: <strong className="text-indigo-600">{dbUser?.role || "LOADING..."}</strong></p>
+            <p className="text-gray-500 mt-2">Welcome to your secure portal. Your active authority level is: <strong className="text-indigo-600 uppercase tracking-wider">{dbUser?.role || (syncStatus.includes('🔴') ? "Sync Error" : "Loading...")}</strong></p>
           </div>
           <button onClick={() => navigate("/profile")} className="hidden md:flex items-center gap-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold px-5 py-2.5 rounded-xl transition border border-indigo-100">
              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
@@ -381,7 +414,7 @@ export default function Dashboard() {
                        <p className="text-3xl font-black text-indigo-700 leading-none">{res.total_score} <span className="text-sm font-bold text-gray-400">/ {res.exams?.total_marks}</span></p>
                      </div>
                      {res.status === 'PASS' && (
-                       <button onClick={() => alert("Printing Module will generate E-Certificate from this payload!")} className="text-indigo-600 bg-indigo-50 border border-indigo-200 hover:bg-indigo-600 hover:text-white p-2.5 rounded-xl transition shadow-sm" title="Download Passing Certificate">
+                       <button onClick={() => navigate(`/certificate/${res.exam_id}?score=${res.total_score}&date=${new Date(res.created_at).toLocaleDateString()}`)} className="text-indigo-600 bg-indigo-50 border border-indigo-200 hover:bg-indigo-600 hover:text-white p-2.5 rounded-xl transition shadow-sm" title="Download Passing Certificate">
                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                        </button>
                      )}
