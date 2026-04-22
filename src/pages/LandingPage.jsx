@@ -1,43 +1,57 @@
 import { useState } from "react";
 import { SignedIn, SignedOut, SignIn, UserButton } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
+import ThemeToggle from "../components/ThemeToggle";
 
 export default function LandingPage() {
   const navigate = useNavigate();
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+    setIsMobileMenuOpen(false);
+  };
+
+  const contactSupport = () => {
+    window.open("https://wa.me/916205839760", "_blank");
+  };
+
   const glassPanel = "bg-white/70 backdrop-blur-xl border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)]";
   const cardHover = "transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)]";
   const textGradient = "bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500";
   const navLink = "text-gray-500 hover:text-indigo-600 font-medium transition-colors cursor-pointer";
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-[#fbfbfd]">
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-200/50 rounded-full blur-3xl pointer-events-none mix-blend-multiply animate-pulse" style={{ animationDuration: '8s' }}></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-200/50 rounded-full blur-3xl pointer-events-none mix-blend-multiply animate-pulse" style={{ animationDuration: '10s' }}></div>
+    <div className="min-h-screen relative overflow-hidden bg-[#fbfbfd] dark:bg-slate-950 transition-colors duration-300">
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-200/50 dark:bg-indigo-900/20 rounded-full blur-3xl pointer-events-none mix-blend-multiply animate-pulse" style={{ animationDuration: '8s' }}></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-200/50 dark:bg-purple-900/20 rounded-full blur-3xl pointer-events-none mix-blend-multiply animate-pulse" style={{ animationDuration: '10s' }}></div>
 
       {/* HEADER */}
-      <nav className={`fixed w-full z-50 ${glassPanel} transition-all duration-300`}>
+      <nav className={`fixed w-full z-50 ${glassPanel} dark:bg-slate-900/70 dark:border-slate-800 transition-all duration-300`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex justify-between items-center">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate("/")}>
             <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
               <svg className="h-6 w-6 text-white transform -rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-800 tracking-tight">Prep<span className={textGradient}>Exam</span></h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white tracking-tight">Prep<span className={textGradient}>Exam</span></h1>
           </div>
 
           <div className="hidden md:flex items-center gap-8">
             <SignedOut>
-              <a className={navLink}>Overview</a>
-              <a className={navLink}>How it Works</a>
+              <a onClick={() => scrollToSection('overview')} className={navLink}>Overview</a>
+              <a onClick={() => scrollToSection('how-it-works')} className={navLink}>How it Works</a>
             </SignedOut>
             <SignedIn>
-              <a onClick={() => navigate("/dashboard")} className={`${navLink} text-indigo-600 font-bold bg-indigo-50 px-4 py-2 rounded-xl border border-indigo-100`}>Dashboard →</a>
+              <a onClick={() => navigate("/dashboard")} className={`${navLink} text-indigo-600 font-bold bg-indigo-50 dark:bg-indigo-900/30 px-4 py-2 rounded-xl border border-indigo-100 dark:border-indigo-800`}>Dashboard →</a>
             </SignedIn>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-4">
+            <ThemeToggle />
             <div className="hidden lg:flex items-center gap-2 text-gray-500">
               <button className="p-2 hover:bg-gray-100 rounded-full transition"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></button>
             </div>
@@ -48,7 +62,7 @@ export default function LandingPage() {
             </div>
 
             <SignedOut>
-              <button className="hidden sm:block px-5 py-2 text-sm font-semibold rounded-xl text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-colors">Support</button>
+              <button onClick={contactSupport} className="hidden sm:block px-5 py-2 text-sm font-semibold rounded-xl text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-colors">Support</button>
             </SignedOut>
             <SignedIn><UserButton appearance={{ elements: { userButtonAvatarBox: "w-9 h-9 border-2 border-indigo-50" } }} /></SignedIn>
 
@@ -70,9 +84,9 @@ export default function LandingPage() {
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-gray-100 bg-white p-4 flex flex-col gap-4 animate-in slide-in-from-top duration-300">
             <SignedOut>
-              <a className={`${navLink} py-2`}>Overview</a>
-              <a className={`${navLink} py-2`}>How it Works</a>
-              <button className="w-full py-3 text-sm font-semibold rounded-xl text-indigo-600 bg-indigo-50">Contact Support</button>
+              <a onClick={() => scrollToSection('overview')} className={`${navLink} py-2`}>Overview</a>
+              <a onClick={() => scrollToSection('how-it-works')} className={`${navLink} py-2`}>How it Works</a>
+              <button onClick={contactSupport} className="w-full py-3 text-sm font-semibold rounded-xl text-indigo-600 bg-indigo-50">Contact Support</button>
             </SignedOut>
             <SignedIn>
               <button onClick={() => navigate("/dashboard")} className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl">Enter Dashboard</button>
@@ -84,7 +98,7 @@ export default function LandingPage() {
       <main className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 pt-32 pb-12">
         <SignedOut>
           {/* HERO */}
-          <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto w-full mb-16 sm:mb-24">
+          <div id="overview" className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto w-full mb-16 sm:mb-24 scroll-mt-32">
             <div className="flex flex-col gap-6 text-center lg:text-left order-2 lg:order-1">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 font-medium text-sm w-max mx-auto lg:mx-0">
                 <span className="relative flex h-2.5 w-2.5">
@@ -93,11 +107,11 @@ export default function LandingPage() {
                 </span>
                 Version 2.0 is Live
               </div>
-              <h2 className="text-5xl lg:text-7xl font-extrabold text-gray-900 leading-tight">
+              <h2 className="text-5xl lg:text-7xl font-extrabold text-gray-900 dark:text-white leading-tight">
                 The Future of <br className="hidden lg:block"/>
                 <span className={textGradient}>Online Validations.</span>
               </h2>
-              <p className="text-lg lg:text-xl text-gray-500 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              <p className="text-lg lg:text-xl text-gray-500 dark:text-gray-400 max-w-xl mx-auto lg:mx-0 leading-relaxed">
                 Experience a secure, ultra-fast, and completely seamless examination ecosystem designed for the modern generation.
               </p>
             </div>
@@ -133,7 +147,7 @@ export default function LandingPage() {
           </div>
 
           {/* HOW IT WORKS */}
-          <section className="w-full max-w-7xl mx-auto py-20 border-t border-gray-200/60">
+          <section id="how-it-works" className="w-full max-w-7xl mx-auto py-20 border-t border-gray-200/60 scroll-mt-20">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4">How It Works</h2>
               <p className="text-gray-500 text-lg max-w-2xl mx-auto">A seamless 3-step pipeline designed to simplify examination creation, monitoring, and evaluation for everyone.</p>
@@ -165,7 +179,7 @@ export default function LandingPage() {
           </section>
 
           {/* ORIGINAL MODULE: CORE PLATFORM FEATURES */}
-          <section className="features-section w-full max-w-7xl mx-auto py-20 mt-10 border-t border-gray-200/60">
+          <section id="features" className="features-section w-full max-w-7xl mx-auto py-20 mt-10 border-t border-gray-200/60 scroll-mt-20">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4">Why choose PrepExam?</h2>
               <p className="text-gray-500 text-lg max-w-2xl mx-auto">We provide a state-of-the-art infrastructure designed to scale, secure, and streamline your entire examination workflow.</p>
@@ -223,7 +237,7 @@ export default function LandingPage() {
             <div>
               <h4 className="font-bold text-gray-900 mb-4">Platform</h4>
               <ul className="space-y-3 text-sm text-gray-500">
-                <li><a className="hover:text-indigo-600 transition cursor-pointer">Features</a></li>
+                <li><a onClick={() => scrollToSection('features')} className="hover:text-indigo-600 transition cursor-pointer">Features</a></li>
                 <li><a className="hover:text-indigo-600 transition cursor-pointer">Integrations</a></li>
                 <li><a className="hover:text-indigo-600 transition cursor-pointer">Security</a></li>
               </ul>
@@ -233,7 +247,7 @@ export default function LandingPage() {
               <ul className="space-y-3 text-sm text-gray-500">
                 <li><a className="hover:text-indigo-600 transition cursor-pointer">Documentation</a></li>
                 <li><a className="hover:text-indigo-600 transition cursor-pointer">Help Center</a></li>
-                <li><a className="hover:text-indigo-600 transition cursor-pointer">Contact Us</a></li>
+                <li><a onClick={contactSupport} className="hover:text-indigo-600 transition cursor-pointer">Contact Us</a></li>
               </ul>
             </div>
             <div>

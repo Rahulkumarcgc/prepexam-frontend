@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { SignedIn, UserButton, useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import emailjs from "@emailjs/browser";
+import ThemeToggle from "../components/ThemeToggle";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -169,14 +170,14 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f4f6fa] p-6 font-sans">
-      <nav className="w-full h-16 bg-white rounded-2xl shadow-sm border border-gray-100 flex justify-between items-center px-6 mb-8">
-        <h1 className="text-xl font-bold text-indigo-700">PrepExam Portal</h1>
+    <div className="min-h-screen bg-[#f4f6fa] dark:bg-slate-950 p-6 font-sans transition-colors duration-300">
+      <nav className="w-full h-16 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 flex justify-between items-center px-6 mb-8">
+        <h1 onClick={() => navigate("/")} className="text-xl font-bold text-indigo-700 dark:text-indigo-400 cursor-pointer">PrepExam Portal</h1>
         <div className="flex items-center gap-4">
-          <span className="text-xs font-semibold text-gray-400 bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
-            {syncStatus}
-          </span>
-          <button onClick={() => navigate("/")} className="text-sm font-semibold text-gray-500 hover:text-gray-800">Home</button>
+          <ThemeToggle />
+          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700" title={syncStatus}>
+            <div className={`w-2.5 h-2.5 rounded-full animate-pulse ${syncStatus.includes('🟢') ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.6)]' : syncStatus.includes('🔴') ? 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.6)]' : 'bg-amber-500'}`}></div>
+          </div>
           <SignedIn><UserButton /></SignedIn>
         </div>
       </nav>
@@ -221,39 +222,41 @@ export default function Dashboard() {
 
         {/* Admin Action: Create Exam Card */}
         {dbUser?.role === 'ADMIN' && (
-          <div onClick={() => navigate("/admin/create-exam")} className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:-translate-y-1 hover:shadow-md cursor-pointer transition">
-            <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center mb-4">
+          <div onClick={() => navigate("/admin/create-exam")} className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800 hover:-translate-y-1 hover:shadow-md cursor-pointer transition">
+            <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mb-4">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
             </div>
-            <h3 className="font-bold text-lg mb-1">Create Exam</h3>
-            <p className="text-sm text-gray-500">Draft a new objective test.</p>
+            <h3 className="font-bold text-lg mb-1 dark:text-white">Create Exam</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Draft a new objective test.</p>
           </div>
         )}
 
         {/* Admin/Teacher Action: Central Question Bank Card */}
-        <div onClick={() => { if (dbUser?.role === 'ADMIN' || dbUser?.role === 'TEACHER') navigate("/admin/question-bank") }} className={`bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:-translate-y-1 hover:shadow-md transition ${(dbUser?.role === 'ADMIN' || dbUser?.role === 'TEACHER') ? 'cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}>
-          <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mb-4">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+        {(dbUser?.role === 'ADMIN' || dbUser?.role === 'TEACHER') && (
+          <div onClick={() => navigate("/admin/question-bank")} className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800 hover:-translate-y-1 hover:shadow-md transition cursor-pointer">
+            <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center mb-4">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+            </div>
+            <h3 className="font-bold text-lg mb-1 dark:text-white">Question Bank Master</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Create Subject Folders & Save MCQs.</p>
           </div>
-          <h3 className="font-bold text-lg mb-1">Question Bank Master</h3>
-          <p className="text-sm text-gray-500">Create Subject Folders & Save MCQs.</p>
-        </div>
+        )}
 
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:-translate-y-1 transition border-l-4 border-l-red-400">
-          <div className="w-12 h-12 bg-red-50 text-red-600 rounded-xl flex items-center justify-center mb-4">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800 hover:-translate-y-1 transition border-l-4 border-l-red-400">
+          <div className="w-12 h-12 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl flex items-center justify-center mb-4">
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           </div>
-          <h3 className="font-bold text-lg mb-1">Demo Student View</h3>
-          <p className="text-sm text-gray-500 mb-4">Test the lockdown exam environment.</p>
-          <button onClick={() => navigate("/exam/demo")} className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 font-bold rounded-lg text-sm transition">Take Demo Test</button>
+          <h3 className="font-bold text-lg mb-1 dark:text-white">Demo Student View</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Test the lockdown exam environment.</p>
+          <button onClick={() => navigate("/exam/demo")} className="px-4 py-2 bg-red-50 dark:bg-red-900/40 text-red-600 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/60 font-bold rounded-lg text-sm transition">Take Demo Test</button>
         </div>
 
       </div>
 
       {/* NEW: DYNAMIC RECENT EXAMS LIST */}
-      <div className="max-w-6xl mx-auto mt-12 bg-white p-8 rounded-3xl shadow-sm border border-gray-100 mb-10">
+      <div className="max-w-6xl mx-auto mt-12 bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800 mb-10">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 border-l-4 border-indigo-500 pl-3">Active Exams Library</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white border-l-4 border-indigo-500 pl-3">Active Exams Library</h2>
         </div>
 
         {exams.length === 0 ? (
@@ -268,22 +271,33 @@ export default function Dashboard() {
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-gray-50 text-gray-500 text-sm uppercase tracking-wide border-b border-gray-100">
+                  <tr className="bg-gray-50 dark:bg-slate-800/50 text-gray-500 dark:text-gray-400 text-sm uppercase tracking-wide border-b border-gray-100 dark:border-slate-800">
                     <th className="p-4 font-semibold rounded-tl-xl">Exam Title</th>
                     <th className="p-4 font-semibold">Duration</th>
-                    <th className="p-4 font-semibold">Total Marks</th>
+                    <th className="p-4 font-semibold">Schedule</th>
                     <th className="p-4 font-semibold">Status</th>
                     <th className="p-4 font-semibold rounded-tr-xl">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {exams.map((exam) => (
-                    <tr key={exam.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition">
-                      <td className="p-4 font-bold text-gray-800">{exam.title}</td>
-                      <td className="p-4 text-gray-600">{exam.duration_minutes} Mins</td>
-                      <td className="p-4 text-gray-600 font-medium">{exam.total_marks} Marks</td>
+                    <tr key={exam.id} className="border-b border-gray-50 dark:border-slate-800 hover:bg-gray-50/50 dark:hover:bg-slate-800/50 transition">
+                      <td className="p-4 font-bold text-gray-800 dark:text-slate-100">{exam.title}</td>
+                      <td className="p-4 text-gray-600 dark:text-slate-300 font-medium">{exam.duration_minutes} Mins</td>
                       <td className="p-4">
-                        <span className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-xs font-bold border border-emerald-100">{exam.status}</span>
+                        <div className="flex flex-col">
+                          <span className="text-emerald-600 dark:text-emerald-400 font-bold">+{exam.marks_per_question}</span>
+                          <span className="text-red-500 dark:text-red-400 text-[10px] font-bold">-{exam.negative_marks}</span>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex flex-col text-[10px] font-bold uppercase tracking-tighter">
+                          <span className="text-emerald-500 dark:text-emerald-400">START: {exam.valid_from ? new Date(exam.valid_from).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'NOW'}</span>
+                          <span className="text-red-400 dark:text-red-300">END: {exam.valid_until ? new Date(exam.valid_until).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'FOREVER'}</span>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <span className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-3 py-1 rounded-full text-xs font-bold border border-emerald-100 dark:border-emerald-800">{exam.status}</span>
                       </td>
                       <td className="p-4 flex gap-2">
                         {(dbUser?.role === 'ADMIN' || dbUser?.role === 'TEACHER') && (
@@ -291,7 +305,10 @@ export default function Dashboard() {
                         )}
                         {dbUser?.role === 'STUDENT' && (
                           pastResults.find(r => r.exam_id === exam.id) ? (
-                            <button disabled className="text-gray-400 font-bold bg-gray-100 text-xs uppercase tracking-widest border border-gray-200 px-3 py-1.5 rounded-lg">Attempted</button>
+                            <div className="flex items-center gap-2">
+                              <span className="text-gray-400 font-bold bg-gray-100 text-[10px] uppercase tracking-widest border border-gray-200 px-3 py-1.5 rounded-lg">Attempted</span>
+                              <button onClick={() => navigate(`/exam/${exam.id}/result`)} className="text-indigo-600 font-bold hover:text-indigo-800 text-sm transition border border-indigo-200 px-3 py-1.5 rounded-lg hover:bg-indigo-50">Report</button>
+                            </div>
                           ) : (
                             <button onClick={() => navigate(`/exam/${exam.id}`)} className="text-emerald-600 font-bold hover:text-emerald-800 text-sm transition border border-emerald-200 px-3 py-1.5 rounded-lg hover:bg-emerald-50">Attempt</button>
                           )
@@ -309,30 +326,33 @@ export default function Dashboard() {
             {/* Mobile Card View */}
             <div className="md:hidden grid grid-cols-1 gap-4">
               {exams.map((exam) => (
-                <div key={exam.id} className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                <div key={exam.id} className="bg-gray-50 dark:bg-slate-900/50 rounded-2xl p-5 border border-gray-100 dark:border-slate-800">
                   <div className="flex justify-between items-start mb-3">
-                    <h4 className="font-bold text-gray-800 text-lg leading-tight">{exam.title}</h4>
-                    <span className="bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full text-[10px] font-black border border-emerald-100 uppercase">{exam.status}</span>
+                    <h4 className="font-bold text-gray-800 dark:text-white text-lg leading-tight">{exam.title}</h4>
+                    <span className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full text-[10px] font-black border border-emerald-100 dark:border-emerald-800 uppercase">{exam.status}</span>
                   </div>
-                  <div className="flex gap-4 mb-5">
+                  <div className="grid grid-cols-2 gap-4 mb-5">
                     <div>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase">Duration</p>
-                      <p className="text-sm font-bold text-gray-700">{exam.duration_minutes}m</p>
+                      <p className="text-[10px] text-gray-400 dark:text-slate-400 font-bold uppercase">Validity & Time</p>
+                      <p className="text-[10px] font-bold text-gray-700 dark:text-slate-200">{exam.duration_minutes}m • {exam.valid_from ? new Date(exam.valid_from).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Any'} - {exam.valid_until ? new Date(exam.valid_until).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'End'}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase">Marks</p>
-                      <p className="text-sm font-bold text-gray-700">{exam.total_marks}</p>
+                      <p className="text-[10px] text-gray-400 dark:text-slate-400 font-bold uppercase">Marking Scheme</p>
+                      <p className="text-xs font-bold text-gray-700 dark:text-slate-200">+{exam.marks_per_question} / <span className="text-red-500 dark:text-red-400">-{exam.negative_marks}</span></p>
                     </div>
                   </div>
                   <div className="flex gap-2">
                     {(dbUser?.role === 'ADMIN' || dbUser?.role === 'TEACHER') && (
-                      <button onClick={() => navigate(`/admin/exam/${exam.id}`)} className="flex-1 py-2.5 bg-indigo-50 text-indigo-600 font-bold rounded-xl text-sm">Manage</button>
+                      <button onClick={() => navigate(`/admin/exam/${exam.id}`)} className="flex-1 py-2.5 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 font-bold rounded-xl text-sm border border-indigo-200 dark:border-indigo-800">Manage</button>
                     )}
                     {dbUser?.role === 'STUDENT' && (
                       pastResults.find(r => r.exam_id === exam.id) ? (
-                        <button disabled className="flex-1 py-2.5 bg-gray-100 text-gray-400 font-bold rounded-xl text-sm">Attempted</button>
+                        <div className="flex flex-col w-full gap-2">
+                           <button disabled className="w-full py-2.5 bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-gray-500 font-bold rounded-xl text-sm border border-gray-200 dark:border-slate-700">Already Attempted</button>
+                           <button onClick={() => navigate(`/exam/${exam.id}/result`)} className="w-full py-2.5 bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 font-bold rounded-xl text-sm border border-indigo-200 dark:border-indigo-800">View & Download Report</button>
+                        </div>
                       ) : (
-                        <button onClick={() => navigate(`/exam/${exam.id}`)} className="flex-1 py-2.5 bg-emerald-600 text-white font-bold rounded-xl text-sm">Attempt Test</button>
+                        <button onClick={() => navigate(`/exam/${exam.id}`)} className="flex-1 py-2.5 bg-emerald-600 text-white font-bold rounded-xl text-sm shadow-lg shadow-emerald-500/20">Attempt Test</button>
                       )
                     )}
                   </div>
@@ -345,8 +365,8 @@ export default function Dashboard() {
 
       {/* NEW: STUDENT EXAM HISTORY */}
       {dbUser?.role === 'STUDENT' && pastResults.length > 0 && (
-        <div className="max-w-6xl mx-auto bg-white p-8 rounded-3xl shadow-sm border border-gray-100 mb-10">
-          <h2 className="text-2xl font-bold text-gray-900 border-l-4 border-indigo-500 pl-3 mb-6">My Academic Records</h2>
+        <div className="max-w-6xl mx-auto bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-800 mb-10">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white border-l-4 border-indigo-500 pl-3 mb-6">My Academic Records</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
              {pastResults.map(res => (
                 <div key={res.id} className="border border-gray-100 bg-gray-50 hover:bg-white rounded-2xl p-6 relative overflow-hidden transition group shadow-sm hover:shadow-md">

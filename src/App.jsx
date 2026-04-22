@@ -6,6 +6,7 @@ import CreateExam from "./pages/CreateExam";
 import ManageExam from "./pages/ManageExam";
 import QuestionBank from "./pages/QuestionBank";
 import Profile from "./pages/Profile";
+import ResultPage from "./pages/ResultPage";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <Route path="/admin/exam/:examId" element={<ManageExam />} />
       <Route path="/admin/question-bank" element={<QuestionBank />} />
       <Route path="/exam/:examId" element={<ExamRoom />} />
+      <Route path="/exam/:examId/result" element={<ResultPage />} />
     </Routes>
   );
 }

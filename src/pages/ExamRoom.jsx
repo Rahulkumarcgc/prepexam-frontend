@@ -47,7 +47,28 @@ export default function ExamRoom() {
     if (examId !== 'demo') {
       loadExam();
     } else {
-      setLoading(false); // Quick render if on the static dummy page link
+      // Load 10 Hardcoded Demo Questions
+      setExamMeta({
+        title: "PrepExam Demo Certification",
+        duration_minutes: 10,
+        total_marks: 10,
+        marks_per_question: 1,
+        negative_marks: 0.25
+      });
+      setQuestions([
+        { id: 'd1', question_text: "What is the capital of India?", option_a: "Mumbai", option_b: "New Delhi", option_c: "Kolkata", option_d: "Chennai", correct_option: "B" },
+        { id: 'd2', question_text: "Which planet is known as the Red Planet?", option_a: "Venus", option_b: "Mars", option_c: "Jupiter", option_d: "Saturn", correct_option: "B" },
+        { id: 'd3', question_text: "Which is the largest ocean on Earth?", option_a: "Atlantic", option_b: "Indian", option_c: "Arctic", option_d: "Pacific", correct_option: "D" },
+        { id: 'd4', question_text: "What does HTML stand for?", option_a: "HyperText Markup Language", option_b: "HighText Machine Language", option_c: "HyperLoop Main Logic", option_d: "HyperText Multi Language", correct_option: "A" },
+        { id: 'd5', question_text: "Which is the fastest land animal on Earth?", option_a: "Lion", option_b: "Cheetah", option_c: "Tiger", option_d: "Horse", correct_option: "B" },
+        { id: 'd6', question_text: "Who is known as the Father of the Indian Constitution?", option_a: "Mahatma Gandhi", option_b: "B.R. Ambedkar", option_c: "Jawaharlal Nehru", option_d: "Sardar Patel", correct_option: "B" },
+        { id: 'd7', question_text: "What is the currency of Japan?", option_a: "Dollar", option_b: "Yen", option_c: "Won", option_d: "Yuan", correct_option: "B" },
+        { id: 'd8', question_text: "What is the main gas found in the Sun?", option_a: "Oxygen", option_b: "Nitrogen", option_c: "Hydrogen", option_d: "Helium", correct_option: "C" },
+        { id: 'd9', question_text: "What is the square root of 144?", option_a: "10", option_b: "11", option_c: "12", option_d: "14", correct_option: "C" },
+        { id: 'd10', question_text: "Which gas do plants absorb from the atmosphere during photosynthesis?", option_a: "Oxygen", option_b: "Carbon Dioxide", option_c: "Nitrogen", option_d: "Hydrogen", correct_option: "B" }
+      ]);
+      setTimeLeft(600); // 10 minutes
+      setLoading(false);
     }
   }, [examId]);
 
@@ -93,7 +114,18 @@ export default function ExamRoom() {
 
   const handleFinalSubmit = async () => {
     if (examId === 'demo') {
-       navigate('/dashboard'); return;
+       // Calculate Mock Result for Demo
+       let score = 0;
+       questions.forEach(q => {
+         if (answers[q.id] === q.correct_option) score += 1;
+         else if (answers[q.id]) score -= 0.25;
+       });
+       setExamResult({
+         total_score: score.toFixed(2),
+         status: score >= 4 ? 'PASS' : 'FAIL'
+       });
+       setSubmitting(false);
+       return;
     }
     
     setSubmitting(true);
@@ -176,27 +208,71 @@ export default function ExamRoom() {
   // IF EXAM IS FINISHED
   if (examResult) {
     return (
-      <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col items-center justify-center p-6">
-         <div className="w-24 h-24 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mb-6">
-            <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7"/></svg>
+      <div className="min-h-screen bg-[#0f172a] text-gray-100 flex flex-col items-center py-12 px-6">
+         <div className="w-20 h-20 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mb-6 shadow-2xl shadow-emerald-500/20">
+            <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7"/></svg>
          </div>
-         <h1 className="text-4xl font-extrabold text-white mb-2">Exam Successfully Evaluated</h1>
-         <p className="text-gray-400 mb-8 max-w-md text-center">Your responses have been processed through the Auto-Grading Engine.</p>
+         <h1 className="text-3xl md:text-5xl font-black text-white mb-2 text-center">Exam Evaluated</h1>
+         <p className="text-gray-400 mb-10 max-w-md text-center text-sm md:text-base">Your responses have been processed through the Auto-Grading Engine. You can now review your performance below.</p>
          
-         <div className="bg-gray-800 border border-gray-700 p-8 rounded-3xl w-full max-w-md mb-8">
-            <div className="flex justify-between items-center border-b border-gray-700 pb-4 mb-4">
-               <span className="text-gray-400">Final Score</span>
-               <span className="text-3xl font-bold text-white">{examResult.total_score} <span className="text-sm text-gray-500">/ {examMeta?.total_marks}</span></span>
+         <div className="grid md:grid-cols-2 gap-6 w-full max-w-4xl mb-10">
+            <div className="bg-white/5 border border-white/10 p-8 rounded-[2rem] backdrop-blur-xl">
+               <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Final Score</p>
+               <h3 className="text-5xl font-black text-white">{examResult.total_score} <span className="text-lg text-gray-500">/ {examMeta?.total_marks}</span></h3>
             </div>
-            <div className="flex justify-between items-center">
-               <span className="text-gray-400">Result Status</span>
-               <span className={`px-4 py-1 rounded-full font-bold uppercase ${examResult.status === 'PASS' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-500'}`}>
-                 {examResult.status}
-               </span>
+            <div className="bg-white/5 border border-white/10 p-8 rounded-[2rem] backdrop-blur-xl flex flex-col justify-between">
+               <div>
+                 <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Result Status</p>
+                 <span className={`px-4 py-1 rounded-xl font-black text-xs uppercase ${examResult.status === 'PASS' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>
+                   {examResult.status}
+                 </span>
+               </div>
+               <button onClick={() => window.print()} className="mt-4 flex items-center gap-2 text-indigo-400 font-bold text-sm hover:text-indigo-300 transition">
+                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                 Download Answer Report (PDF)
+               </button>
+            </div>
+         </div>
+
+         {/* DETAILED REPORT SECTION */}
+         <div className="w-full max-w-4xl bg-white/5 border border-white/10 rounded-[2.5rem] p-6 md:p-10 mb-12 print:bg-white print:text-black">
+            <h2 className="text-2xl font-bold mb-8 flex items-center gap-3">
+              <span className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center text-sm font-black">?</span>
+              Response Analysis
+            </h2>
+            
+            <div className="space-y-8">
+              {questions.map((q, idx) => {
+                const userAns = answers[q.id];
+                const isCorrect = userAns === q.correct_option;
+                return (
+                  <div key={q.id} className={`p-6 rounded-2xl border ${isCorrect ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-red-500/20 bg-red-500/5'} print:border-gray-200 print:bg-white`}>
+                    <div className="flex justify-between items-start mb-4">
+                      <h4 className="font-bold text-lg pr-8"><span className="text-gray-500 mr-2">Q{idx+1}.</span> {q.question_text}</h4>
+                      <span className={`px-3 py-1 rounded-lg text-[10px] font-black uppercase ${isCorrect ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'}`}>
+                        {isCorrect ? 'Correct' : 'Incorrect'}
+                      </span>
+                    </div>
+                    
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className={`p-4 rounded-xl border ${userAns === q.correct_option ? 'border-emerald-500 bg-emerald-500/10' : 'border-red-500 bg-red-500/10'} print:border-gray-300`}>
+                        <p className="text-[10px] font-black uppercase mb-1 opacity-60">Your Answer</p>
+                        <p className="font-bold text-sm">{userAns ? `${userAns}. ${q['option_' + userAns.toLowerCase()]}` : 'Not Answered'}</p>
+                      </div>
+                      {!isCorrect && (
+                        <div className="p-4 rounded-xl border border-emerald-500 bg-emerald-500/10 print:border-gray-300">
+                          <p className="text-[10px] font-black uppercase mb-1 opacity-60 text-emerald-500">Correct Answer</p>
+                          <p className="font-bold text-sm text-emerald-400 print:text-emerald-700">{q.correct_option}. {q['option_' + q.correct_option.toLowerCase()]}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
          </div>
          
-         <button onClick={() => navigate("/dashboard")} className="px-8 py-3 font-bold bg-gray-800 border border-gray-700 rounded-xl hover:bg-gray-700 transition">Return to Portals Dashboard</button>
+         <button onClick={() => navigate("/dashboard")} className="px-10 py-4 font-bold bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl transition shadow-xl shadow-indigo-500/20 mb-20">Return to Portals Dashboard</button>
       </div>
     );
   }
