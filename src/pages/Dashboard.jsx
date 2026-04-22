@@ -263,59 +263,82 @@ export default function Dashboard() {
             <p className="text-gray-400">Click on 'Create Exam' to add your first test.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-gray-50 text-gray-500 text-sm uppercase tracking-wide border-b border-gray-100">
-                  <th className="p-4 font-semibold rounded-tl-xl">Exam Title</th>
-                  <th className="p-4 font-semibold">Duration</th>
-                  <th className="p-4 font-semibold">Total Marks</th>
-                  <th className="p-4 font-semibold">Status</th>
-                  <th className="p-4 font-semibold rounded-tr-xl">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {exams.map((exam) => (
-                  <tr key={exam.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition">
-                    <td className="p-4 font-bold text-gray-800">{exam.title}</td>
-                    <td className="p-4 text-gray-600">{exam.duration_minutes} Mins</td>
-                    <td className="p-4 text-gray-600 font-medium">{exam.total_marks} Marks</td>
-                    <td className="p-4">
-                      <span className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-xs font-bold border border-emerald-100">{exam.status}</span>
-                    </td>
-                    <td className="p-4 flex gap-2">
-                      {/* Teacher/Admin Action */}
-                      {(dbUser?.role === 'ADMIN' || dbUser?.role === 'TEACHER') && (
-                        <button onClick={() => navigate(`/admin/exam/${exam.id}`)} className="text-indigo-600 font-bold hover:text-indigo-800 text-sm transition border border-indigo-200 px-3 py-1.5 rounded-lg hover:bg-indigo-50" title="Manage Questions & View Leaderboard">Manage</button>
-                      )}
-
-                      {/* Student Action */}
-                      {dbUser?.role === 'STUDENT' && (
-                        pastResults.find(r => r.exam_id === exam.id) ? (
-                          <button disabled className="text-gray-400 font-bold bg-gray-100 text-xs uppercase tracking-widest border border-gray-200 px-3 py-1.5 rounded-lg cursor-not-allowed">Attempted</button>
-                        ) : (
-                          exam.valid_from && new Date() < new Date(exam.valid_from) ? (
-                             <button disabled className="text-amber-500 font-bold bg-amber-50 text-xs uppercase tracking-widest border border-amber-200 px-3 py-1.5 rounded-lg cursor-not-allowed" title={`Starts: ${new Date(exam.valid_from).toLocaleString()}`}>Upcoming</button>
-                          ) : exam.valid_until && new Date() > new Date(exam.valid_until) ? (
-                             <button disabled className="text-red-500 font-bold bg-red-50 text-xs uppercase tracking-widest border border-red-200 px-3 py-1.5 rounded-lg cursor-not-allowed">Expired</button>
-                          ) : (
-                             <button onClick={() => navigate(`/exam/${exam.id}`)} className="text-emerald-600 font-bold hover:text-emerald-800 text-sm transition border border-emerald-200 px-3 py-1.5 rounded-lg hover:bg-emerald-50">Attempt Test</button>
-                          )
-                        )
-                      )}
-
-                      {/* Admin Exclusive Actions */}
-                      {dbUser?.role === 'ADMIN' && (
-                        <>
-                          <button onClick={() => alert("Admin Edit feature coming up in Role Segregation Phase! (You can update timings/details here)")} className="text-blue-500 font-bold hover:text-blue-700 text-sm transition border border-blue-200 px-3 py-1.5 rounded-lg hover:bg-blue-50" title="Admin Setting Editor">Edit</button>
-                          <button onClick={() => handleDeleteExam(exam.id)} className="text-red-500 font-bold hover:text-red-700 text-sm transition border border-red-200 px-3 py-1.5 rounded-lg hover:bg-red-50">Delete</button>
-                        </>
-                      )}
-                    </td>
+          <div>
+            {/* Desktop Table View */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-gray-50 text-gray-500 text-sm uppercase tracking-wide border-b border-gray-100">
+                    <th className="p-4 font-semibold rounded-tl-xl">Exam Title</th>
+                    <th className="p-4 font-semibold">Duration</th>
+                    <th className="p-4 font-semibold">Total Marks</th>
+                    <th className="p-4 font-semibold">Status</th>
+                    <th className="p-4 font-semibold rounded-tr-xl">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {exams.map((exam) => (
+                    <tr key={exam.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition">
+                      <td className="p-4 font-bold text-gray-800">{exam.title}</td>
+                      <td className="p-4 text-gray-600">{exam.duration_minutes} Mins</td>
+                      <td className="p-4 text-gray-600 font-medium">{exam.total_marks} Marks</td>
+                      <td className="p-4">
+                        <span className="bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-xs font-bold border border-emerald-100">{exam.status}</span>
+                      </td>
+                      <td className="p-4 flex gap-2">
+                        {(dbUser?.role === 'ADMIN' || dbUser?.role === 'TEACHER') && (
+                          <button onClick={() => navigate(`/admin/exam/${exam.id}`)} className="text-indigo-600 font-bold hover:text-indigo-800 text-sm transition border border-indigo-200 px-3 py-1.5 rounded-lg hover:bg-indigo-50">Manage</button>
+                        )}
+                        {dbUser?.role === 'STUDENT' && (
+                          pastResults.find(r => r.exam_id === exam.id) ? (
+                            <button disabled className="text-gray-400 font-bold bg-gray-100 text-xs uppercase tracking-widest border border-gray-200 px-3 py-1.5 rounded-lg">Attempted</button>
+                          ) : (
+                            <button onClick={() => navigate(`/exam/${exam.id}`)} className="text-emerald-600 font-bold hover:text-emerald-800 text-sm transition border border-emerald-200 px-3 py-1.5 rounded-lg hover:bg-emerald-50">Attempt</button>
+                          )
+                        )}
+                        {dbUser?.role === 'ADMIN' && (
+                          <button onClick={() => handleDeleteExam(exam.id)} className="text-red-500 font-bold hover:text-red-700 text-sm transition border border-red-200 px-3 py-1.5 rounded-lg hover:bg-red-50">Delete</button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden grid grid-cols-1 gap-4">
+              {exams.map((exam) => (
+                <div key={exam.id} className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                  <div className="flex justify-between items-start mb-3">
+                    <h4 className="font-bold text-gray-800 text-lg leading-tight">{exam.title}</h4>
+                    <span className="bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full text-[10px] font-black border border-emerald-100 uppercase">{exam.status}</span>
+                  </div>
+                  <div className="flex gap-4 mb-5">
+                    <div>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase">Duration</p>
+                      <p className="text-sm font-bold text-gray-700">{exam.duration_minutes}m</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase">Marks</p>
+                      <p className="text-sm font-bold text-gray-700">{exam.total_marks}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    {(dbUser?.role === 'ADMIN' || dbUser?.role === 'TEACHER') && (
+                      <button onClick={() => navigate(`/admin/exam/${exam.id}`)} className="flex-1 py-2.5 bg-indigo-50 text-indigo-600 font-bold rounded-xl text-sm">Manage</button>
+                    )}
+                    {dbUser?.role === 'STUDENT' && (
+                      pastResults.find(r => r.exam_id === exam.id) ? (
+                        <button disabled className="flex-1 py-2.5 bg-gray-100 text-gray-400 font-bold rounded-xl text-sm">Attempted</button>
+                      ) : (
+                        <button onClick={() => navigate(`/exam/${exam.id}`)} className="flex-1 py-2.5 bg-emerald-600 text-white font-bold rounded-xl text-sm">Attempt Test</button>
+                      )
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>

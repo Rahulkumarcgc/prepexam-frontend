@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 export default function LandingPage() {
   const navigate = useNavigate();
   
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
   const glassPanel = "bg-white/70 backdrop-blur-xl border border-white/40 shadow-[0_8px_30px_rgb(0,0,0,0.04)]";
   const cardHover = "transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)]";
   const textGradient = "bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500";
@@ -15,13 +17,13 @@ export default function LandingPage() {
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-200/50 rounded-full blur-3xl pointer-events-none mix-blend-multiply animate-pulse" style={{ animationDuration: '10s' }}></div>
 
       {/* HEADER */}
-      <nav className={`fixed w-full z-50 ${glassPanel}`}>
-        <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
-          <div className="flex items-center gap-3 cursor-pointer">
+      <nav className={`fixed w-full z-50 ${glassPanel} transition-all duration-300`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex justify-between items-center">
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate("/")}>
             <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
               <svg className="h-6 w-6 text-white transform -rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
             </div>
-            <h1 className="text-2xl font-bold text-gray-800 tracking-tight">Prep<span className={textGradient}>Exam</span></h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-800 tracking-tight">Prep<span className={textGradient}>Exam</span></h1>
           </div>
 
           <div className="hidden md:flex items-center gap-8">
@@ -31,33 +33,57 @@ export default function LandingPage() {
             </SignedOut>
             <SignedIn>
               <a onClick={() => navigate("/dashboard")} className={`${navLink} text-indigo-600 font-bold bg-indigo-50 px-4 py-2 rounded-xl border border-indigo-100`}>Dashboard →</a>
-              <a onClick={() => navigate("/exam/demo")} className={`${navLink} text-red-500 font-bold hover:text-red-600`}>[DEMO] Take Exam View</a>
             </SignedIn>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-2 text-gray-500">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <div className="hidden lg:flex items-center gap-2 text-gray-500">
               <button className="p-2 hover:bg-gray-100 rounded-full transition"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></button>
-              <button className="p-2 hover:bg-gray-100 rounded-full transition"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg></button>
             </div>
             
             <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-100">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-              <span className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">System Live</span>
+              <span className="text-[10px] font-semibold text-emerald-700 uppercase tracking-wide">System Live</span>
             </div>
 
             <SignedOut>
-              <button className="px-5 py-2 text-sm font-semibold rounded-xl text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-colors">Contact Support</button>
+              <button className="hidden sm:block px-5 py-2 text-sm font-semibold rounded-xl text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-colors">Support</button>
             </SignedOut>
             <SignedIn><UserButton appearance={{ elements: { userButtonAvatarBox: "w-9 h-9 border-2 border-indigo-50" } }} /></SignedIn>
+
+            {/* Mobile Menu Toggle */}
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+            >
+              {isMobileMenuOpen ? (
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+              )}
+            </button>
           </div>
         </div>
+
+        {/* Mobile Menu Dropdown */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t border-gray-100 bg-white p-4 flex flex-col gap-4 animate-in slide-in-from-top duration-300">
+            <SignedOut>
+              <a className={`${navLink} py-2`}>Overview</a>
+              <a className={`${navLink} py-2`}>How it Works</a>
+              <button className="w-full py-3 text-sm font-semibold rounded-xl text-indigo-600 bg-indigo-50">Contact Support</button>
+            </SignedOut>
+            <SignedIn>
+              <button onClick={() => navigate("/dashboard")} className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl">Enter Dashboard</button>
+            </SignedIn>
+          </div>
+        )}
       </nav>
 
-      <main className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 pt-32 pb-12">
+      <main className="relative z-10 flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 pt-32 pb-12">
         <SignedOut>
           {/* HERO */}
-          <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto w-full mb-24">
+          <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto w-full mb-16 sm:mb-24">
             <div className="flex flex-col gap-6 text-center lg:text-left order-2 lg:order-1">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 font-medium text-sm w-max mx-auto lg:mx-0">
                 <span className="relative flex h-2.5 w-2.5">

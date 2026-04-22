@@ -271,9 +271,9 @@ export default function ExamRoom() {
               className={`px-6 py-3 font-bold text-gray-400 transition ${currentIdx === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:text-white'}`}>
               ← Previous
             </button>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap justify-center max-w-[150px] md:max-w-none">
                {questions.map((_, i) => (
-                 <div key={i} className={`w-2 h-2 rounded-full ${i === currentIdx ? 'bg-white' : answers[questions[i].id] ? 'bg-indigo-500/50' : 'bg-gray-700'}`}></div>
+                 <div key={i} className={`w-2 h-2 rounded-full flex-shrink-0 ${i === currentIdx ? 'bg-white' : answers[questions[i].id] ? 'bg-indigo-500/50' : 'bg-gray-700'}`}></div>
                ))}
             </div>
             {currentIdx < questions.length - 1 ? (
